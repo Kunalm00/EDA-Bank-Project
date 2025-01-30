@@ -1,65 +1,117 @@
-#df['Job'].value_counts(normalize = True, ascending = True)
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-'''df['Campaign'].mode()
-df['Campaign'] = df['Campaign'].fillna(df['Campaign'].mode()[0])
-#Using [0] extracts the first (and typically only) mode value to fill the missing values.'''
+import warnings
+warnings.filterwarnings('ignore')
 
-# # Data Visualization
+# Load the dataset
+df = pd.read_csv("bank.csv")
+print(df)
+
+print('-------------------------------------------------------------------------------------')
+
+# Display column names
+print("Columns before renaming:", df.columns)
+
+print('-------------------------------------------------------------------------------------')
+
+# Rename columns
+df.rename(columns={'marital': 'Marital_Status',
+                    'pdays': 'Days_Since_Last_Contact',
+                    'poutcome': 'Previous_Outcome',
+                    'y': 'Customer_Subscription'}, inplace=True)
+print("Columns after renaming:", df.columns)
+
+print('-------------------------------------------------------------------------------------')
+
+# Display dataset information
+print(df.info())
+
+print('-------------------------------------------------------------------------------------')
+
+# Display statistical summary
+print(df.describe())
+
+print('-------------------------------------------------------------------------------------')
+
+# Check data types
+print("Data Types before conversion:\n", df.dtypes)
+
+print('-------------------------------------------------------------------------------------')
+
+# Convert categorical columns to category dtype
+categorical_columns = ['job', 'Marital_Status', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'Previous_Outcome', 'Customer_Subscription']
+for col in categorical_columns:
+    df[col] = df[col].astype('category')
+print("Data Types after conversion:\n", df.dtypes)
+
+print('-------------------------------------------------------------------------------------')
+
+# Check for duplicate rows
+df_duplicated = df.duplicated()
+print("Duplicate rows before removal:", df.duplicated().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Remove duplicate rows
+df.drop_duplicates(inplace=True)
+print("Duplicate rows after removal:", df.duplicated().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Check for missing values
+print("Missing values before handling:\n", df.isnull().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Fill missing values in 'Balance' column with mean
+df['balance'] = df['balance'].fillna(df['balance'].mean())
+print("Missing values in 'Balance' column after filling:", df['balance'].isna().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Fill missing values in 'Campaign' column with mean
+df['campaign'] = df['campaign'].fillna(df['campaign'].mode()[0])
+print("Missing values in 'Campaign' column after filling:", df['campaign'].isnull().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Final missing values check
+print("Missing values after handling:\n", df.isnull().sum())
+
+print('-------------------------------------------------------------------------------------')
+
+# Final dataset information
+print(df.info())
+
+print('-------------------------------------------------------------------------------------')
 
 # 1. How many married individuals are unemployed?
-#
-# 2. What is the average age of individuals who subscribed to a term deposit versus those who did not?
-#
-# 3. How does the average balance vary across different contact months?
-#
-# 4. How does the average duration of customer calls vary by month?
-#
-# 5. What is the distribution of marital status (married/single/divorced) across different education levels?
-
-# # 1. How many married individuals are unemployed?
-
-# In[34]:
-
-
-'''df.columns
-
-
-# In[35]:
-
 
 # Filter the dataset for married individuals who are unemployed
-married_unemployed = df[(df['Marital_Status'] == 'married') & (df['Job'] == 'unknown')]
+married_unemployed = df[(df['Marital_Status'] == 'married') & (df['job'] == 'unknown')]
 
 # Count the number of married unemployed individuals
-count_married_unemployed = married_unemployed.count()
+count_married_unemployed = married_unemployed.shape[0]
 print(f"Number of married unemployed individuals: {count_married_unemployed}")
 
-
-# In[36]:
-
-
 # Visualization: Pie chart
-sizes = [count_married_unemployed, df.count() - count_married_unemployed]
+total_count = df.shape[0]
+sizes = [count_married_unemployed, total_count - count_married_unemployed]
+
 plt.pie(sizes, labels=['Married Unemployed', 'Other'], autopct='%1.1f%%', startangle=90,
         colors=['#ff6666', '#66b3ff'], explode=(0.1, 0), shadow=True, wedgeprops={'edgecolor': 'black'})
 plt.title('Proportion of Married Unemployed Individuals', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig(r"D:\Python Project - Dataset\chart.png", dpi=300, bbox_inches='tight')
 plt.show()
 
-
-# # Report
-# The analysis identifies the number of married unemployed individuals in the dataset by filtering for married individuals
-  with an 'unemployed' job status. The result is visualized using a pie chart to show the proportion of married unemployed 
-  individuals compared to the rest. The chart highlights that a small subset of the population falls into this category. 
-  This provides insights into the distribution of employment status among married individuals. The visualization aids in 
-  understanding the relationship between marital status and employment.
-
-# # 2. What is the average age of individuals who subscribed to a term deposit versus those who did not?
+# 2. What is the average age of individuals who subscribed to a term deposit versus those who did not?
 
 # Calculate the average age for both groups: Subscribed and Not Subscribed
-avg_age_subscribed = df[df['Customer_Subscription'] == 'yes']['Age'].mean()
-avg_age_not_subscribed = df[df['Customer_Subscription'] == 'no']['Age'].mean()
+avg_age_subscribed = df[df['Customer_Subscription'] == 'yes']['age'].mean()
+avg_age_not_subscribed = df[df['Customer_Subscription'] == 'no']['age'].mean()
 
 # Data for pie chart
 labels = ['Subscribed', 'Not Subscribed']
@@ -76,13 +128,10 @@ plt.title('Average Age of Individuals Who Subscribed vs. Did Not Subscribe to a 
 plt.tight_layout()
 plt.show()
 
-# # Report
-# The analysis compares the average age of individuals who subscribed and those who did not to a term deposit using a pie chart. The chart highlights the demographic differences between the two groups. It shows that individuals who subscribed have a distinct average age compared to those who did not. This information can help refine marketing strategies targeted at specific age groups. The visualization provides a clear view of the age distribution in relation to term deposit subscriptions..
-
 # # 3. How does the average balance vary across different contact months?
 
 # Group by 'Month' and calculate the average balance for each month
-avg_balance_per_month = df.groupby('Month')['Balance'].mean()
+avg_balance_per_month = df.groupby('month')['balance'].mean()
 
 # Visualization: Horizontal bar chart for average balance across months with similar colors
 plt.figure(figsize=(10,6))
@@ -97,14 +146,10 @@ plt.xlabel('Average Balance', fontsize=12)
 plt.tight_layout()
 plt.show()
 
-
-# # Report
-# The analysis shows how the average balance varies across different contact months using a horizontal bar chart. The chart reveals fluctuations in average balance throughout the months, with some months having higher average balances than others. These variations might be linked to seasonal factors or marketing campaigns. The visualization provides insights into customer behavior and financial patterns, which could inform targeted marketing strategies. It also highlights months with significant changes in customer balances.
-
 # # 4. How does the average duration of customer calls vary by month?
 
 # Group by 'Month' and calculate the average duration of customer calls for each month
-avg_duration_per_month = df.groupby('Month')['Duration'].mean()
+avg_duration_per_month = df.groupby('month')['duration'].mean()
 
 # Visualization: Line chart for average call duration across months
 plt.figure(figsize=(10,6))
@@ -121,14 +166,10 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-
-# # Report
-# The analysis shows how the average duration of customer calls varies across different months. The line chart indicates fluctuations in call duration over the year. Some months show longer call durations, while others have shorter averages. This trend could reflect seasonal marketing efforts or customer engagement patterns. The visualization helps understand how call durations change over time, which can be useful for evaluating the effectiveness of campaigns or customer service performance.
-
 # # 5. What is the distribution of marital status (married/single/divorced) across different education levels?
 
 # Group by 'Education' and 'Marital_Status' to get the count of each marital status for each education level
-education_marital_counts = df.groupby(['Education', 'Marital_Status']).size().unstack(fill_value=0)
+education_marital_counts = df.groupby(['education', 'Marital_Status']).size().unstack(fill_value=0)
 
 # Plotting the stacked bar chart
 education_marital_counts.plot(kind='bar', stacked=True, color=['#66b3ff', '#ff9999', '#ffcc66'], figsize=(10,6))
@@ -141,13 +182,44 @@ plt.ylabel('Number of Individuals', fontsize=12)
 # Show the plot
 plt.tight_layout()
 plt.show()
-'''
 
-#  Report:
-# The analysis visualizes the distribution of marital status across education levels.
-# Higher education levels show a more balanced marital status, while lower levels have more single individuals.
-# This highlights how marital status varies with education.
-# The chart offers valuable insights for demographic analysis and marketing strategies.
+# Univariate Analysis
+numerical_cols = ['age', 'balance', 'duration', 'campaign', 'previous']
+for col in numerical_cols:
+    plt.figure(figsize=(8, 4))
+    sns.histplot(df[col], kde=True)
+    plt.title(f"Distribution of {col}")
+    plt.show()
 
+# Bivariate Analysis
+plt.figure(figsize=(10, 6))
+sns.barplot(x='job', y='balance', data=df, ci=None)
+plt.title("Average Balance by Job Type")
+plt.xticks(rotation=45)
+plt.show()
 
+# Customer Segmentation
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='loan', y='balance', data=df)
+plt.title("Balance Distribution by Loan Status")
+plt.show()
 
+# Correlation Analysis: Select only numeric columns
+numeric_df = df.select_dtypes(include=['number'])
+plt.figure(figsize=(10, 6))
+sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Final Insights and Reporting
+
+print("\nFinal Insights:\n")
+print("1. Number of married unemployed individuals:", count_married_unemployed)
+print('-------------------------------------------------------------------------------------')
+print("2. Average age of individuals who subscribed to term deposit:", avg_age_subscribed)
+print('-------------------------------------------------------------------------------------')
+print("3. Average balance across contact months:\n", avg_balance_per_month)
+print('-------------------------------------------------------------------------------------')
+print("4. Average call duration across months:\n", avg_duration_per_month)
+print('-------------------------------------------------------------------------------------')
+print("5. Distribution of marital status across education levels:\n", education_marital_counts)
