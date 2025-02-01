@@ -13,7 +13,7 @@ print(df)
 print('-------------------------------------------------------------------------------------')
 
 # Display column names
-print("Columns before renaming:", df.columns)
+print(df.columns)
 
 print('-------------------------------------------------------------------------------------')
 
@@ -22,7 +22,7 @@ df.rename(columns={'marital': 'Marital_Status',
                     'pdays': 'Days_Since_Last_Contact',
                     'poutcome': 'Previous_Outcome',
                     'y': 'Customer_Subscription'}, inplace=True)
-print("Columns after renaming:", df.columns)
+print(df.columns)
 
 print('-------------------------------------------------------------------------------------')
 
@@ -37,7 +37,7 @@ print(df.describe())
 print('-------------------------------------------------------------------------------------')
 
 # Check data types
-print("Data Types before conversion:\n", df.dtypes)
+print(df.dtypes)
 
 print('-------------------------------------------------------------------------------------')
 
@@ -51,35 +51,35 @@ print('-------------------------------------------------------------------------
 
 # Check for duplicate rows
 df_duplicated = df.duplicated()
-print("Duplicate rows before removal:", df.duplicated().sum())
+print(df.duplicated().sum())
 
 print('-------------------------------------------------------------------------------------')
 
 # Remove duplicate rows
 df.drop_duplicates(inplace=True)
-print("Duplicate rows after removal:", df.duplicated().sum())
+print(df.duplicated().sum())
 
 print('-------------------------------------------------------------------------------------')
 
 # Check for missing values
-print("Missing values before handling:\n", df.isnull().sum())
+print(df.isnull().sum())
 
 print('-------------------------------------------------------------------------------------')
 
 # Fill missing values in 'Balance' column with mean
 df['balance'] = df['balance'].fillna(df['balance'].mean())
-print("Missing values in 'Balance' column after filling:", df['balance'].isna().sum())
+print(df['balance'].isna().sum())
 
 print('-------------------------------------------------------------------------------------')
 
 # Fill missing values in 'Campaign' column with mean
 df['campaign'] = df['campaign'].fillna(df['campaign'].mode()[0])
-print("Missing values in 'Campaign' column after filling:", df['campaign'].isnull().sum())
+print(df['campaign'].isnull().sum())
 
 print('-------------------------------------------------------------------------------------')
 
 # Final missing values check
-print("Missing values after handling:\n", df.isnull().sum())
+print(df.isnull().sum())
 
 print('-------------------------------------------------------------------------------------')
 
@@ -102,7 +102,7 @@ total_count = df.shape[0]
 sizes = [count_married_unemployed, total_count - count_married_unemployed]
 
 plt.pie(sizes, labels=['Married Unemployed', 'Other'], autopct='%1.1f%%', startangle=90,
-        colors=['#ff6666', '#66b3ff'], explode=(0.1, 0), shadow=True, wedgeprops={'edgecolor': 'black'})
+        colors=['#ff6666', '#66b3ff'], wedgeprops={'edgecolor': 'black'})
 plt.title('Proportion of Married Unemployed Individuals', fontsize=16, fontweight='bold')
 plt.tight_layout()
 plt.show()
